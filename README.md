@@ -25,9 +25,7 @@ Recent versions of the following packages for Python 3 are required:
 All of the datasets we use are publicly available datasets.
 ### Link
 The used datasets are available at:
-* Retail_Rocket https://tianchi.aliyun.com/competition/entrance/231719/information/
-* Alibaba https://github.com/xuehansheng/DualHGCN
-* Amazon https://github.com/YingtongDou/CARE-GNN/tree/master/data
-* YelpChi https://docs.dgl.ai/api/python/dgl.data.html#fraud-dataset
+* Citeseer/Cora/Pubmed: https://github.com/tkipf/gcn/tree/master/gcn/data
+* ogbn-arxiv/ogbn-products/ogbn-papers100M: https://ogb.stanford.edu/docs/leader_nodeprop
 
-Kindly note that there may be two versions of node features for YelpChi. The old version has a dimension of 100 and the new version is 32. In our paper, the results are reported based on the new features.
+## Usage
