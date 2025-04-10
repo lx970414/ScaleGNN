@@ -7,6 +7,7 @@ This is the code for paper:
 Recent versions of the following packages for Python 3 are required:
 * networkx==2.8.4
 * numpy==1.22.3
+* matplotlib==3.5.1
 * PyYAML==6.0.1
 * Requests==2.31.0
 * scikit_learn==1.2.2
@@ -30,8 +31,13 @@ The used datasets are available at:
 
 ## Usage
 
-For Cora/Citeseer/Pubmed
-`python cit.py  --model ScaleGNN --degree 8 --dataset cora/citeseer/pubmed --weight-decay 1e-5 --lr 0.001 --dropout 0.2 --hidden 128 --epoch 100'
+For Cora/Citeseer/Pubmed:
+
+* `python cit.py  --model ScaleGNN --degree 20 --dataset cora/citeseer/pubmed --weight-decay 1e-5 --lr 0.001 --dropout 0.2 --hidden 128 --epoch 100`
+
+For ogbn-arxiv/products/papers100M:
+
+* `python cit_ogbn.py  --model ScaleGNN --degree 20 --dataset ogbn-arxiv/products/papers100M --weight-decay 0 --lr 0.001 --epoch 300 --seed 1 --gpu 4 --patience 200 --hidden 512 --input-drop 0.2`
 
 
 
