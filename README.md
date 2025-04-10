@@ -29,3 +29,9 @@ The used datasets are available at:
 * ogbn-arxiv/ogbn-products/ogbn-papers100M: https://ogb.stanford.edu/docs/leader_nodeprop
 
 ## Usage
+
+For Cora/Citeseer/Pubmed
+`python cit.py  --model ScaleGNN --degree 8 --dataset cora/citeseer/pubmed --weight-decay 1e-5 --lr 0.001 --dropout 0.2 --hidden 128 --epoch 100'
+
+
+
