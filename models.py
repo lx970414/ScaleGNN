@@ -250,7 +250,87 @@ class GCN(nn.Module):
         return x
     
 ###ScaleGNN
+import torch
+import torch.nn.functional as F
+from torch.nn import Module, Linear, Dropout
 
+class ScaleGNN(Module):
+    def __init__(self, in_channels, hidden_channels, out_channels, num_layers=2, dropout=0.5, k=10, p=0.5):
+        super(ScaleGNN, self).__init__()
+        self.k = k
+        self.p = p
+        self.dropout = dropout
+        self.lins = torch.nn.ModuleList()
+        self.lins.append(Linear(in_channels, hidden_channels))
+        for _ in range(num_layers - 2):
+            self.lins.append(Linear(hidden_channels, hidden_channels))
+        self.lins.append(Linear(hidden_channels, out_channels))
+
+    def forward(self, x, adj, features):
+        # Compute similarity
+        sim = torch.mm(features, features.T)
+        sim = sim / (features.norm(dim=1, keepdim=True) * features.norm(dim=1, keepdim=True).T + 1e-8)
+
+        topk_values, topk_indices = torch.topk(sim, self.k, dim=1)
+
+        mask = torch.rand_like(sim)
+        threshold = torch.quantile(mask, self.p)
+        rand_mask = (mask > threshold).float()
+
+        A_filtered = torch.zeros_like(adj)
+        N = adj.size(0)
+        for i in range(N):
+            A_filtered[i, topk_indices[i]] = 1.0
+        A_filtered += rand_mask * (1 - A_filtered)
+        A_filtered = A_filtered * adj  # keep it aligned with original adj structure
+
+        h = x
+        for i, lin in enumerate(self.lins[:-1]):
+            h = torch.mm(A_filtered, h)
+            h = lin(h)
+            h = F.relu(h)
+            h = F.dropout(h, p=self.dropout, training=self.training)
+        h = torch.mm(A_filtered, h)
+        h = self.lins[-1](h)
+
+        return F.log_softmax(h, dim=-1), A_filtered, topk_indices
+
+def lcs_loss(A_filtered, features, topk_indices):
+    sim = torch.mm(features, features.T)
+    sim = sim / (features.norm(dim=1, keepdim=True) * features.norm(dim=1, keepdim=True).T + 1e-8)
+
+    loss = 0.0
+    N = A_filtered.size(0)
+    for i in range(N):
+        neighbors = topk_indices[i]
+        lcs_vals = sim[i, neighbors]
+        loss += torch.sum((1 - lcs_vals) ** 2)
+    return loss / N
+
+def sparse_loss(A_filtered):
+    return torch.sum(torch.abs(A_filtered)) / A_filtered.numel()
+
+def train(model, data, optimizer, lambda1=0.5, lambda2=1e-4):
+    model.train()
+    optimizer.zero_grad()
+    
+    out, A_filtered, topk_indices = model(data.x, data.adj, data.x)
+    loss_task = F.nll_loss(out[data.train_mask], data.y[data.train_mask])
+    loss_lcs = lcs_loss(A_filtered, data.x, topk_indices)
+    loss_sparse = sparse_loss(A_filtered)
+    
+    loss = loss_task + lambda1 * loss_lcs + lambda2 * loss_sparse
+    loss.backward()
+    optimizer.step()
+    return loss.item()
+
+def test(model, data):
+    model.eval()
+    out, _, _ = model(data.x, data.adj, data.x)
+    pred = out.argmax(dim=1)
+    correct = pred[data.test_mask] == data.y[data.test_mask]
+    acc = int(correct.sum()) / int(data.test_mask.sum())
+    return acc
 
 ###ScaleGNN
     
