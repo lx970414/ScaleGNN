@@ -1,0 +1,78 @@
+# 1. 通用实验参数
+seed: 42             # 随机种子，保证可复现
+device: cuda:0       # 训练设备
+
+# 2. 数据集与数据加载
+dataset: ogbn-arxiv              # 支持 'cora', 'pubmed', 'citeseer', 'ogbn-arxiv', 'ogbn-products' 等
+data_root: ./data                # 数据文件目录
+
+# 3. 模型参数（in_dim/out_dim 会自动设置，无需填写）
+model:
+  in_dim: null                   # 自动填写，无需修改
+  out_dim: null                  # 自动填写，无需修改
+  hidden_dim: 128                # 隐藏层维度
+  num_layers: 3                  # GNN叠加层数（等价于最大采样阶数）
+  max_k: 20                      # 每阶采样邻居数（NeighborLoader/top-k等）
+  dropout: 0.5                   # Dropout比例
+
+  # ablation消融实验选项（如不消融可全部删掉或全设false）
+  ablation:
+    only_high_order: false       # ScaleGNN_b（仅高阶邻接分解，无LCS/融合等）
+    no_lcs: false                # 关闭LCS邻居筛选与掩码
+    no_fusion: false             # 关闭特征融合结构
+    fix_alpha: false             # 多阶权重alpha不学习，固定平均
+    fix_mk: false                # topk不学习，固定最大邻居数
+    fix_beta: false              # 融合权重beta不学习，固定为0.5
+
+# 4. 训练参数
+train:
+  lr: 0.01                       # 学习率
+  weight_decay: 5e-4             # 权重衰减
+  epochs: 300                    # 训练轮次
+  log_interval: 10               # 日志打印间隔
+  save_path: ./save              # 保存最优权重与实验日志的目录
+  batch_size: 1024               # 大图批训练采样的batch size（小图全图训练可忽略）
+  num_workers: 8                 # DataLoader线程数（OGB推荐大于等于8）
+
+
+# 5. loss
+loss:
+  lambda_lcs: 0.01   # LCS监督损失权重
+  lambda_sc: 0.0001  # 稀疏正则权重
+
+
+# 5. 其它可选参数（高级实验可扩展）
+# early_stopping: 50             # 早停patience，若需可打开
+# use_wandb: false               # 是否集成WandB
+# eval_metric: acc               # 评测指标，可选 acc/f1/micro-f1 等
+
+
+
+
+# dataset: 'Cora'          # 'Cora', 'Pubmed', 'ogbn-arxiv', etc.
+# data_root: './data'
+# device: 'cuda'
+# seed: 42
+
+# model:
+#   hidden_dim: 128
+#   num_layers: 3
+#   dropout: 0.5
+
+# max_k: 20                # Maximum number of candidate neighbours per order
+
+# train:
+#   epochs: 200
+#   batch_size: 1024
+#   lr: 0.005
+#   weight_decay: 5e-4
+#   log_interval: 10
+#   save_path: './checkpoints'
+
+# loss:
+#   lambda_lcs: 0.01
+#   lambda_sc: 0.0001
+
+# ablation:
+#   fix_alpha: false
+#   fix_mk: false
