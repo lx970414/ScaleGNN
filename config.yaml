@@ -48,7 +48,6 @@ eval_metric: acc               # 评测指标，可选 acc/f1/micro-f1 等
 
 
 
-
 # dataset: 'Cora'          # 'Cora', 'Pubmed', 'ogbn-arxiv', etc.
 # data_root: './data'
 # device: 'cuda'
