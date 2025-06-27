@@ -41,10 +41,10 @@ loss:
   lambda_sc: 0.0001  # 稀疏正则权重
 
 
-# 5. 其它可选参数（高级实验可扩展）
-# early_stopping: 50             # 早停patience，若需可打开
-# use_wandb: false               # 是否集成WandB
-# eval_metric: acc               # 评测指标，可选 acc/f1/micro-f1 等
+# 6. 其它可选参数（高级实验可扩展）
+early_stopping: 50             # 早停patience，若需可打开
+use_wandb: false               # 是否集成WandB
+eval_metric: acc               # 评测指标，可选 acc/f1/micro-f1 等
 
 
 
