@@ -26,7 +26,7 @@ model:
 
 # 4. 训练参数
 train:
-  lr: 0.001                       # 学习率
+  lr: 0.01                       # 学习率
   weight_decay: 5e-4             # 权重衰减
   epochs: 300                    # 训练轮次
   log_interval: 10               # 日志打印间隔
